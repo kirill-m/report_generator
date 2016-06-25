@@ -33,7 +33,21 @@ public class ReportGenerator {
         settingsParser.init();
 
         PageBuilder builder = new PageBuilder(sourcePath, settingsParser);
-        System.out.println(builder.build());
+        ArrayList<String[]> list = new ArrayList<>(builder.build());
+
+//        for (int i = 0; i < max; i++) {
+//            for (int j = 0; j < list.size(); j++) {
+//                if (list.get(i).length == max)
+//                    System.out.print(list.get(j)[i] + " ");
+//                else if (i <= list.get(j).length)
+//                    System.out.print(list.get(j)[i] + " ");
+//                else
+//                    System.out.println("NULL ");
+//                System.out.println();
+//            }
+//        }
+
+
 
         try {
             commandLine = parser.parse(options, args);
