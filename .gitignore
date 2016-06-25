@@ -1,0 +1,10 @@
+/local.properties
+/.idea/*
+.DS_Store
+/build
+*.class
+
+workspace.xml
+tasks.xml
+*.iws
+*.log
