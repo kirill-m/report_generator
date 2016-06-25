@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by kirill
  */
-public class XmlParser {
+public class SettingsParser {
 
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     File file;
@@ -26,7 +26,7 @@ public class XmlParser {
     int pageWidth, pageHeight;
     List<Column> columns = new LinkedList<>();
 
-    XmlParser(String path) {
+    SettingsParser(String path) {
         file = new File(path);
     }
 
@@ -37,8 +37,8 @@ public class XmlParser {
         getPageSize();
         getColumnsInfo();
 
-        for (Column column : columns)
-            System.out.println(column.getTitle() + " " + column.getWidth());
+//        for (Column column : columns)
+//            System.out.println(column.getTitle() + " " + column.getWidth());
     }
 
     private void getPageSize() {
@@ -95,6 +95,14 @@ public class XmlParser {
 
     public List<Column> getColumns() {
         return columns;
+    }
+
+    public String[] getTitlesRow() {
+        String[] row = new String[columns.size()];
+        for (int i = 0; i < row.length; i++)
+            row[i] = columns.get(i).getTitle();
+
+        return row;
     }
 }
 

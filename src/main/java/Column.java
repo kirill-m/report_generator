@@ -2,8 +2,8 @@
  * Created by kirill
  */
 public class Column {
-    String title;
-    int width;
+    private String title;
+    private int width;
 
     public Column(String title, int width) {
         this.title = title;

@@ -1,10 +1,8 @@
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
 import org.apache.commons.cli.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,27 +29,11 @@ public class ReportGenerator {
         String sourcePath = directory + "source-data.tsv";
         String reportPath = directory + "report.txt";
 
-        TsvParserSettings settings = new TsvParserSettings();
-        TsvParser tsvParser = new TsvParser(settings);
+        SettingsParser settingsParser = new SettingsParser(settingsPath);
+        settingsParser.init();
 
-        try {
-            list = tsvParser.parseAll(new InputStreamReader(new FileInputStream(sourcePath), "UTF-16"));
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        for (String[] item : list) {
-            for (String str : item) {
-                System.out.print(str);
-                System.out.print(" ");
-            }
-            System.out.println();
-        }
-
-        XmlParser xmlParser = new XmlParser(settingsPath);
-        xmlParser.init();
-
-
-
+        PageBuilder builder = new PageBuilder(sourcePath, settingsParser);
+        System.out.println(builder.build());
 
         try {
             commandLine = parser.parse(options, args);
