@@ -32,21 +32,14 @@ public class ReportGenerator {
         SettingsParser settingsParser = new SettingsParser(settingsPath);
         settingsParser.init();
 
-        RowBuilder builder = new RowBuilder(sourcePath, settingsParser);
-        ArrayList<String[]> list = new ArrayList<>(builder.build());
-
-//        for (int i = 0; i < max; i++) {
-//            for (int j = 0; j < list.size(); j++) {
-//                if (list.get(i).length == max)
-//                    System.out.print(list.get(j)[i] + " ");
-//                else if (i <= list.get(j).length)
-//                    System.out.print(list.get(j)[i] + " ");
-//                else
-//                    System.out.println("NULL ");
-//                System.out.println();
-//            }
-//        }
-
+        String[] strArr = {"5", "Юлианна-Оксана Сухово-Кобылина", "29/11/2009"};
+        RowBuilder builder = new RowBuilder(strArr, settingsParser);
+        //ArrayList<String> list = new ArrayList<>(builder.build());
+        ArrayList<ArrayList<String>> tmp = new ReportBuilder(sourcePath, settingsParser).build();
+        for (ArrayList<String> item : tmp)
+            for (String word : item) {
+                System.out.print(word);
+            }
 
 
         try {
