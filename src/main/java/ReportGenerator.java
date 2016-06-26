@@ -32,7 +32,7 @@ public class ReportGenerator {
         SettingsParser settingsParser = new SettingsParser(settingsPath);
         settingsParser.init();
 
-        PageBuilder builder = new PageBuilder(sourcePath, settingsParser);
+        RowBuilder builder = new RowBuilder(sourcePath, settingsParser);
         ArrayList<String[]> list = new ArrayList<>(builder.build());
 
 //        for (int i = 0; i < max; i++) {

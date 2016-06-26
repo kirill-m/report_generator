@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by kirill
  */
-public class PageBuilder {
+public class RowBuilder {
 
     File file;
     SettingsParser settingsParser;
@@ -16,7 +16,7 @@ public class PageBuilder {
     ArrayList<String[]> rowTitles;
     String rowDivider;
 
-    PageBuilder(String path, SettingsParser parser) {
+    RowBuilder(String path, SettingsParser parser) {
         file = new File(path);
         settingsParser = parser;
     }
@@ -29,8 +29,8 @@ public class PageBuilder {
             sb.append(PageBuilderConsts.ROW_DIVIDER);
         rowDivider = sb.toString();
 
-        ArrayList<String[]> result = generateRow(new String[]{"short-short", "29/11/2009", "Юлианна-Оксана Сухово-Кобылина"});
-        formRow(result);
+        ArrayList<String[]> result = generateRow(new String[]{"5", "Юлианна-Оксана Сухово-Кобылина", "29/11/2009", });
+        transformRow(result);
         return result;
     }
 
@@ -43,24 +43,14 @@ public class PageBuilder {
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-//        for (String[] item : parcedSrcFile) {
-//            for (String str : item) {
-//                System.out.print(str);
-//                System.out.print(" ");
-//            }
-//            System.out.println();
-//        }
     }
 
     private ArrayList<String[]> generateRow(String[] inputRow) {
         ArrayList<String[]> result = new ArrayList<>();
-        final int pageWidth = settingsParser.getPageWidth();
         int rowsNumber = 1;
         ArrayList<String> generatedRow = new ArrayList<>();
-
         Collections.addAll(generatedRow, inputRow);
-        int inputStrLen;
-        int currentPageWidth = 2;
+
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < generatedRow.size(); i++) {
@@ -145,7 +135,7 @@ public class PageBuilder {
         return result.toArray(new String[result.size()]);
     }
 
-    private void formRow(ArrayList<String[]> row) {
+    private ArrayList<String[]> transformRow(ArrayList<String[]> row) {
         int max = 1;
         int colWidth = 0;
 
@@ -155,27 +145,67 @@ public class PageBuilder {
             }
         }
 
+        ArrayList<String[]> result = new ArrayList<>();
+        for (int i = 0; i < row.size(); i++)
+            result.add(i, new String[max]);
+
         System.out.println();
         for (int i = 0; i < max; i++) {
             for (int j = 0; j < row.size(); j++) {
                 colWidth = settingsParser.getColumns().get(j).getWidth();
-                if (row.get(j).length == max)
-                    System.out.print( " " + row.get(j)[i] + " ");
-                else if (i < row.get(j).length) {
+
+                if (row.get(j).length == max) {
+                    if (i == max - 1) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(row.get(j)[i]);
+                        for (int k = 0; k < colWidth - row.get(j)[i].length(); k++)
+                            sb.append(PageBuilderConsts.SPACE);
+                        result.get(j)[i] = sb.toString();
+                    } else
+                        result.get(j)[i] = row.get(j)[i];
+                    //System.out.print(" " + row.get(j)[i] + " ");
+                } else if (i < row.get(j).length) {
                     StringBuilder sb = new StringBuilder();
                     sb.append(row.get(j)[i]);
                     for (int k = 0; k < colWidth - row.get(j)[i].length(); k++)
                         sb.append(PageBuilderConsts.SPACE);
-                    System.out.print(sb.toString());
-                }
-                else {
+                    result.get(j)[i] = sb.toString();
+                    //System.out.print(sb.toString());
+                } else {
                     StringBuilder sb = new StringBuilder();
                     for (int k = 0; k < colWidth; k++)
                         sb.append(PageBuilderConsts.SPACE);
-                    System.out.print(sb.toString());
+                    result.get(j)[i] = sb.toString();
+                    //System.out.print(sb.toString());
                 }
             }
-            System.out.println();
+            //System.out.println();
         }
+        decorateRow(result, max);
+        return result;
+    }
+
+    private ArrayList<String> decorateRow(ArrayList<String[]> row, int max) {
+        System.out.println("L000L");
+        int maxLen = max;
+
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 0; i < max; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < row.size(); j++) {
+                sb.append(PageBuilderConsts.COLUMN_DIVIDER)
+                        .append(PageBuilderConsts.SPACE)
+                        .append(row.get(j)[i])
+                        .append(PageBuilderConsts.SPACE);
+                if (j == row.size() - 1)
+                    sb.append(PageBuilderConsts.ROW_DIVIDER)
+                            .append(PageBuilderConsts.NEXT_LINE);
+            }
+            result.add(sb.toString());
+        }
+
+        for (String str : result)
+            System.out.print(str);
+        return result;
     }
 }
