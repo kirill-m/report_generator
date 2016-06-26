@@ -11,9 +11,8 @@ import java.util.List;
  */
 public class ReportBuilder {
 
-    RowBuilder rowBuilder;
-    ArrayList<String> titleRow = new ArrayList<>();
-    String rowDivider;
+    Row titleRow;
+    Row rowDivider;
     SettingsParser settingsParser;
     File file;
     List<String[]> parcedSrcFile = new LinkedList<>();
@@ -23,25 +22,37 @@ public class ReportBuilder {
         this.settingsParser = settingsParser;
     }
 
-    public ArrayList<ArrayList<String>> build() {
-        ArrayList<ArrayList<String>> result = new ArrayList<>();
+    public ArrayList<Row> build() {
 
         generateRowDivider();
         generateTitleRow();
         readSrcFile();
 
-        for (String item : titleRow)
-            System.out.print(item);
-        System.out.print(rowDivider);
+        return splitReportByPages();
+    }
 
-        ArrayList<String> divider = new ArrayList<String>();
-        divider.add(rowDivider);
-        for (String[] item : parcedSrcFile) {
-            result.add(new RowBuilder(item, settingsParser).build());
-            result.add(divider);
+    public void writeToFile(String path, ArrayList<Row> report) {
+        File file = new File(path);
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(file);
+            for (Row row : report)
+                fos.write(row.getRow().getBytes());
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found " + e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Error while closing stream: " + e);
+            }
+
         }
-
-        return result;
     }
 
     private void generateRowDivider() {
@@ -49,7 +60,7 @@ public class ReportBuilder {
         for (int i = 0; i < settingsParser.getPageWidth(); i++)
             sb.append(PageBuilderConsts.ROW_DIVIDER);
         sb.append(PageBuilderConsts.NEXT_LINE);
-        rowDivider = sb.toString();
+        rowDivider = new Row(sb.toString(), 1);
     }
 
     private void generateTitleRow() {
@@ -65,5 +76,41 @@ public class ReportBuilder {
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    private ArrayList<Row> splitReportByPages() {
+        ArrayList<Row> result = new ArrayList<>();
+        int pageHeight = settingsParser.getPageHeight();
+        for (String[] item : parcedSrcFile) {
+            result.add(new RowBuilder(item, settingsParser).build());
+        }
+        ArrayList<Row> finalResult = new ArrayList<>();
+        finalResult.add(titleRow);
+        finalResult.add(rowDivider);
+        finalResult.add(result.get(0));
+        for (int i = 1; i < result.size(); i++) {
+            if (getCurrentPageHeight(finalResult) + rowDivider.getHeight() + result.get(i).getHeight() < pageHeight) {
+                finalResult.add(rowDivider);
+                finalResult.add(result.get(i));
+            } else {
+                finalResult.add(new Row(PageBuilderConsts.PAGES_SEPARATOR, 1));
+                finalResult.add(titleRow);
+                finalResult.add(rowDivider);
+                finalResult.add(result.get(i));
+            }
+        }
+
+        return finalResult;
+    }
+
+    private int getCurrentPageHeight(ArrayList<Row> rows) {
+        int height = 0;
+        for (Row row : rows) {
+            height += row.getHeight();
+            if (PageBuilderConsts.PAGES_SEPARATOR.equals(row.getRow())) {
+                height = 0;
+            }
+        }
+        return height;
     }
 }

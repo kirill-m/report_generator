@@ -7,27 +7,15 @@ import java.util.*;
  */
 public class RowBuilder {
 
-    //File file;
     SettingsParser settingsParser;
-    List<String[]> parcedSrcFile = new LinkedList<>();
-    ArrayList<String[]> rowTitles;
-    String rowDivider;
     String[] str;
 
     RowBuilder(String[] str, SettingsParser parser) {
-        //file = new File(path);
         this.str = str;
         settingsParser = parser;
     }
 
-    public ArrayList<String> build() {
-//        readSrcFile();
-//        rowTitles = generateRow(settingsParser.getTitlesRow());
-//        StringBuilder sb = new StringBuilder();
-//        for (int i = 0; i < settingsParser.getPageWidth(); i++)
-//            sb.append(PageBuilderConsts.ROW_DIVIDER);
-//        rowDivider = sb.toString();
-
+    public Row build() {
         return transformRow(generateRow(str));
     }
 
@@ -101,7 +89,7 @@ public class RowBuilder {
         return result.toArray(new String[result.size()]);
     }
 
-    private ArrayList<String> transformRow(ArrayList<String[]> row) {
+    private Row transformRow(ArrayList<String[]> row) {
         int max = 1;
         int colWidth;
 
@@ -147,11 +135,11 @@ public class RowBuilder {
         return decorateRow(result, max);
     }
 
-    private ArrayList<String> decorateRow(ArrayList<String[]> row, int max) {
+    private Row decorateRow(ArrayList<String[]> row, int max) {
 
-        ArrayList<String> result = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < max; i++) {
-            StringBuilder sb = new StringBuilder();
+
             for (int j = 0; j < row.size(); j++) {
                 sb.append(PageBuilderConsts.COLUMN_DIVIDER)
                         .append(PageBuilderConsts.SPACE)
@@ -161,11 +149,7 @@ public class RowBuilder {
                     sb.append(PageBuilderConsts.COLUMN_DIVIDER)
                             .append(PageBuilderConsts.NEXT_LINE);
             }
-            result.add(sb.toString());
         }
-
-//        for (String str : result)
-//            System.out.print(str);
-        return result;
+        return new Row(sb.toString(), max);
     }
 }

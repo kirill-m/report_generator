@@ -23,7 +23,7 @@ public class SettingsParser {
     DocumentBuilder db;
     Document doc;
 
-    int pageWidth, pageHeight;
+    private int pageWidth, pageHeight;
     List<Column> columns = new LinkedList<>();
 
     SettingsParser(String path) {

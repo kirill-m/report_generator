@@ -4,7 +4,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by kirill
@@ -14,7 +13,6 @@ public class ReportGenerator {
     private static Options options = new Options();
     //static String directory = System.getProperty("user.dir");
     static String directory = "/Users/kirill/Desktop/task/";
-    static List<String[]> list = new ArrayList<>();
 
     static {
         options.addOption(new Option("s", "settings",true, "Settings file path"));
@@ -35,11 +33,12 @@ public class ReportGenerator {
         String[] strArr = {"5", "Юлианна-Оксана Сухово-Кобылина", "29/11/2009"};
         RowBuilder builder = new RowBuilder(strArr, settingsParser);
         //ArrayList<String> list = new ArrayList<>(builder.build());
-        ArrayList<ArrayList<String>> tmp = new ReportBuilder(sourcePath, settingsParser).build();
-        for (ArrayList<String> item : tmp)
-            for (String word : item) {
-                System.out.print(word);
-            }
+        ReportBuilder reportBuilder = new ReportBuilder(sourcePath, settingsParser);
+        ArrayList<Row> tmp = reportBuilder.build();
+        reportBuilder.writeToFile(reportPath, tmp);
+        for (Row row : tmp) {
+            System.out.print(row.getRow());
+        }
 
 
         try {
