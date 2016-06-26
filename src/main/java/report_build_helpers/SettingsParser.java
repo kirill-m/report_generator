@@ -1,8 +1,11 @@
+package report_build_helpers;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import page_elements.Column;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,19 +29,22 @@ public class SettingsParser {
     private int pageWidth, pageHeight;
     List<Column> columns = new LinkedList<>();
 
-    SettingsParser(String path) {
+    public SettingsParser(String path) {
         file = new File(path);
     }
 
     public void init() throws IOException, SAXException, ParserConfigurationException {
         db = dbf.newDocumentBuilder();
-        doc = db.parse(file);
-        doc.getDocumentElement().normalize();
-        getPageSize();
-        getColumnsInfo();
-
-//        for (Column column : columns)
-//            System.out.println(column.getTitle() + " " + column.getWidth());
+        if (file.exists()) {
+            doc = db.parse(file);
+            doc.getDocumentElement().normalize();
+            getPageSize();
+            getColumnsInfo();
+        } else {
+            System.out.println("Settings file not found. Exit.");
+            System.out.println(file.getAbsolutePath());
+            System.exit(1);
+        }
     }
 
     private void getPageSize() {

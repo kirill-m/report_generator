@@ -1,5 +1,8 @@
+package report_build_helpers;
+
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
+import page_elements.Row;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,7 +20,7 @@ public class ReportBuilder {
     File file;
     List<String[]> parcedSrcFile = new LinkedList<>();
 
-    ReportBuilder(String path, SettingsParser settingsParser) {
+    public ReportBuilder(String path, SettingsParser settingsParser) {
         file = new File(path);
         this.settingsParser = settingsParser;
     }
@@ -37,8 +40,12 @@ public class ReportBuilder {
 
         try {
             fos = new FileOutputStream(file);
+            Writer out = new BufferedWriter(new OutputStreamWriter(
+                    fos, "UTF-16"));
             for (Row row : report)
-                fos.write(row.getRow().getBytes());
+                out.append(row.getRow());
+            out.flush();
+            out.close();
         } catch (FileNotFoundException e) {
             System.out.println("File not found " + e);
         } catch (IOException e) {
@@ -51,8 +58,8 @@ public class ReportBuilder {
             } catch (IOException e) {
                 System.out.println("Error while closing stream: " + e);
             }
-
         }
+        System.out.println("Report done (" + path + ")");
     }
 
     private void generateRowDivider() {
@@ -73,8 +80,11 @@ public class ReportBuilder {
 
         try {
             parcedSrcFile = tsvParser.parseAll(new InputStreamReader(new FileInputStream(file), "UTF-16"));
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.out.println("Source data file not found " + e);
+            System.exit(1);
         }
     }
 
@@ -93,7 +103,7 @@ public class ReportBuilder {
                 finalResult.add(rowDivider);
                 finalResult.add(result.get(i));
             } else {
-                finalResult.add(new Row(PageBuilderConsts.PAGES_SEPARATOR, 1));
+                finalResult.add(new Row(PageBuilderConsts.PAGES_SEPARATOR, 0));
                 finalResult.add(titleRow);
                 finalResult.add(rowDivider);
                 finalResult.add(result.get(i));

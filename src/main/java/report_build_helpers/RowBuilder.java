@@ -1,4 +1,7 @@
+package report_build_helpers;
+
 import com.google.common.base.Splitter;
+import page_elements.Row;
 
 import java.util.*;
 
@@ -10,7 +13,7 @@ public class RowBuilder {
     SettingsParser settingsParser;
     String[] str;
 
-    RowBuilder(String[] str, SettingsParser parser) {
+    public RowBuilder(String[] str, SettingsParser parser) {
         this.str = str;
         settingsParser = parser;
     }
@@ -18,7 +21,6 @@ public class RowBuilder {
     public Row build() {
         return transformRow(generateRow(str));
     }
-
 
 
     private ArrayList<String[]> generateRow(String[] inputRow) {
@@ -48,12 +50,17 @@ public class RowBuilder {
     private String[] fitToWidth(String str, int width) {
         ArrayList<String> splitList = new ArrayList<>();
         ArrayList<String> result = new ArrayList<>();
-        StringTokenizer st = new StringTokenizer(str, " -/", true);
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            splitList.add(token);
-        }
+        String[] out = str.split("((?<=[^a-zA-Z0-9.])|(?=[^a-zA-Z0-9.]))");
 
+        Collections.addAll(splitList, out);
+
+        if (out.length == 1 && out[0].length() > width) {
+            for(final String token : Splitter
+                    .fixedLength(width)
+                    .split(out[0])) {
+                result.add(token);
+            }
+        }
         String tmp;
         for (int i = 0; i < splitList.size() - 1;) {
             if(splitList.get(i).length() <= width) {
@@ -113,6 +120,7 @@ public class RowBuilder {
                         sb.append(row.get(j)[i]);
                         for (int k = 0; k < colWidth - row.get(j)[i].length(); k++)
                             sb.append(PageBuilderConsts.SPACE);
+
                         result.get(j)[i] = sb.toString();
                     } else
                         result.get(j)[i] = row.get(j)[i];
@@ -130,7 +138,6 @@ public class RowBuilder {
                 }
             }
         }
-
 
         return decorateRow(result, max);
     }
